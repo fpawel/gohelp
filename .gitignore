@@ -1,0 +1,13 @@
+debug
+build
+bin
+.vscode/
+.idea/
+*.exe
+.idea
+*.~*
+*.local
+*.identcache
+*.stat
+*.vlb
+*.rsm
