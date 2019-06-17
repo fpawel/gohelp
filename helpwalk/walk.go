@@ -1,7 +1,6 @@
 package helpwalk
 
-import
-(
+import (
 	"github.com/fpawel/comm/comport"
 	"github.com/lxn/walk"
 	. "github.com/lxn/walk/declarative"
@@ -15,7 +14,7 @@ func ComboBoxComport(comboBox **walk.ComboBox, key string) ComboBox {
 	return ComboBox{
 		AssignTo:     comboBox,
 		Model:        getComports(),
-		CurrentIndex: ComportIndex(IniStr(key)),
+		CurrentIndex: comportIndex(IniStr(key)),
 		OnMouseDown: func(_, _ int, _ walk.MouseButton) {
 			cb := *comboBox
 			n := cb.CurrentIndex()
@@ -32,18 +31,29 @@ func ComboBoxComport(comboBox **walk.ComboBox, key string) ComboBox {
 	}
 }
 
-func ComportIndex(portName string) int {
-	ports, _ := comport.Ports()
-	return ComboBoxIndex(portName, ports)
+func ComboBoxWithStringList(comboBox **walk.ComboBox, key string, model []string) ComboBox {
+	return ComboBox{
+		AssignTo:     comboBox,
+		Model:        model,
+		CurrentIndex: comboBoxIndex(IniStr(key), model),
+		OnCurrentIndexChanged: func() {
+			IniPutStr(key, (*comboBox).Text())
+		},
+	}
 }
 
-func ComboBoxIndex(s string, m []string) int {
+func comboBoxIndex(s string, m []string) int {
 	for i, x := range m {
 		if s == x {
 			return i
 		}
 	}
 	return -1
+}
+
+func comportIndex(portName string) int {
+	ports, _ := comport.Ports()
+	return comboBoxIndex(portName, ports)
 }
 
 func getComports() []string {
