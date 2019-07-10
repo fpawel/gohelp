@@ -6,14 +6,15 @@ import (
 	"github.com/fpawel/gohelp/winapp"
 	"github.com/fpawel/goutils"
 	"github.com/lxn/win"
+	"github.com/powerman/structlog"
+	"sync"
 )
 
 type NotifyWindow struct {
 	hWnd, hWndPeer      win.HWND
 	peerWindowClassName string
+	mu                  sync.Mutex
 }
-
-type formatMsgFunc = func(uintptr) string
 
 func NewNotifyWindow(windowClassName, peerWindowClassName string) *NotifyWindow {
 	return &NotifyWindow{
@@ -22,21 +23,40 @@ func NewNotifyWindow(windowClassName, peerWindowClassName string) *NotifyWindow 
 	}
 }
 
-func (x *NotifyWindow) CloseWindowR() bool {
+func (x *NotifyWindow) TryClose() bool {
 	return win.SendMessage(x.hWnd, win.WM_CLOSE, 0, 0) == 0
 }
 
-func (x *NotifyWindow) CloseWindow() {
-	x.CloseWindowR()
+func (x *NotifyWindow) Close() {
+	x.TryClose()
+}
+
+func (x *NotifyWindow) ResetPeer() {
+	x.mu.Lock()
+	defer x.mu.Unlock()
+	x.hWndPeer = 0
+	log.Info(x.peerWindowClassName + ": peer closed")
+}
+
+func (x *NotifyWindow) InitPeer() {
+	x.mu.Lock()
+	defer x.mu.Unlock()
+	x.hWndPeer = winapp.FindWindow(x.peerWindowClassName)
+	if !winapp.IsWindow(x.hWndPeer) {
+		log.PrintErr(x.peerWindowClassName + ": init peer: window class not found")
+		return
+	}
+	log.Info(x.peerWindowClassName + ": init peer")
+
 }
 
 func (x *NotifyWindow) sendMsg(msg uintptr, b []byte) {
+	x.mu.Lock()
+	hWndPeer := x.hWndPeer
+	x.mu.Unlock()
 
-	if !winapp.IsWindow(x.hWndPeer) {
-		x.hWndPeer = winapp.FindWindow(x.peerWindowClassName)
-	}
-	if winapp.IsWindow(x.hWndPeer) && SendMessage(x.hWnd, x.hWndPeer, msg, b) == 0 {
-		x.hWndPeer = 0
+	if hWndPeer != 0 && SendMessage(x.hWnd, hWndPeer, msg, b) == 0 {
+		log.PrintErr("SendMessage failed: " + x.peerWindowClassName)
 	}
 }
 
@@ -59,3 +79,5 @@ func (x *NotifyWindow) NotifyJson(msg uintptr, param interface{}) {
 func (x *NotifyWindow) Notifyf(msg uintptr, format string, a ...interface{}) {
 	x.NotifyStr(msg, fmt.Sprintf(format, a...))
 }
+
+var log = structlog.New()
