@@ -56,7 +56,7 @@ func (x *NotifyWindow) sendMsg(msg uintptr, b []byte) {
 	x.mu.Unlock()
 
 	if hWndPeer != 0 && SendMessage(x.hWnd, hWndPeer, msg, b) == 0 {
-		log.PrintErr("SendMessage failed: " + x.peerWindowClassName)
+		log.PrintErr(fmt.Sprintf("SendMessage failed: %s: %d", x.peerWindowClassName, msg))
 	}
 }
 
