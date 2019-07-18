@@ -41,17 +41,23 @@ func (x *NotifyWindow) ResetPeer() {
 func (x *NotifyWindow) InitPeer() {
 	x.mu.Lock()
 	defer x.mu.Unlock()
+	x.initPeer()
+}
+
+func (x *NotifyWindow) initPeer() {
 	x.hWndPeer = winapp.FindWindow(x.peerWindowClassName)
 	if !winapp.IsWindow(x.hWndPeer) {
 		log.PrintErr(x.peerWindowClassName + ": init peer: window class not found")
 		return
 	}
 	log.Info(x.peerWindowClassName + ": init peer")
-
 }
 
 func (x *NotifyWindow) sendMsg(msg uintptr, b []byte) {
 	x.mu.Lock()
+	if x.hWndPeer == 0 {
+		x.initPeer()
+	}
 	hWndPeer := x.hWndPeer
 	x.mu.Unlock()
 
