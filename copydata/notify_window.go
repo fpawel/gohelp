@@ -62,7 +62,7 @@ func (x *NotifyWindow) sendMsg(msg uintptr, b []byte) {
 	x.mu.Unlock()
 
 	if hWndPeer != 0 && SendMessage(x.hWnd, hWndPeer, msg, b) == 0 {
-		log.PrintErr(fmt.Sprintf("SendMessage failed: %s: %d", x.peerWindowClassName, msg))
+		log.PrintErr(fmt.Sprintf("SendMessage failed: %s: %d, %+v, %+v", x.peerWindowClassName, msg, x.hWnd, hWndPeer))
 	}
 }
 
@@ -86,4 +86,6 @@ func (x *NotifyWindow) Notifyf(msg uintptr, format string, a ...interface{}) {
 	x.NotifyStr(msg, fmt.Sprintf(format, a...))
 }
 
-var log = structlog.New()
+var (
+	log = structlog.New()
+)
