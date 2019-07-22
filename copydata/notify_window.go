@@ -55,12 +55,11 @@ func (x *NotifyWindow) initPeer() {
 
 func (x *NotifyWindow) sendMsg(msg uintptr, b []byte) {
 	x.mu.Lock()
+	defer x.mu.Unlock()
 	if x.hWndPeer == 0 {
 		x.initPeer()
 	}
 	hWndPeer := x.hWndPeer
-	x.mu.Unlock()
-
 	if hWndPeer != 0 && SendMessage(x.hWnd, hWndPeer, msg, b) == 0 {
 		log.PrintErr(fmt.Sprintf("SendMessage failed: %s: %d, %+v, %+v", x.peerWindowClassName, msg, x.hWnd, hWndPeer))
 	}

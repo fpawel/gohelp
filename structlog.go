@@ -2,7 +2,7 @@ package gohelp
 
 import "github.com/powerman/structlog"
 
-func LogWithKeys(logger *structlog.Logger, args ...interface{}) *structlog.Logger {
+func LogPrependSuffixKeys(log *structlog.Logger, args ...interface{}) *structlog.Logger {
 	var keys []string
 	for i, arg := range args {
 		if i%2 == 0 {
@@ -13,9 +13,10 @@ func LogWithKeys(logger *structlog.Logger, args ...interface{}) *structlog.Logge
 			keys = append(keys, k)
 		}
 	}
-	return logger.New(args...).PrependSuffixKeys(keys...)
+
+	return log.New(args...).PrependSuffixKeys(keys...)
 }
 
-func NewLogWithKeys(args ...interface{}) *structlog.Logger {
-	return LogWithKeys(structlog.New(), args...)
+func NewLogWithSuffixKeys(args ...interface{}) *structlog.Logger {
+	return LogPrependSuffixKeys(structlog.New(), args...)
 }
