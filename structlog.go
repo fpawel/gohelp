@@ -1,6 +1,8 @@
 package gohelp
 
-import "github.com/powerman/structlog"
+import (
+	"github.com/powerman/structlog"
+)
 
 func LogPrependSuffixKeys(log *structlog.Logger, args ...interface{}) *structlog.Logger {
 	var keys []string
