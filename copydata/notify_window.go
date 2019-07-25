@@ -35,7 +35,7 @@ func (x *NotifyWindow) ResetPeer() {
 	x.mu.Lock()
 	defer x.mu.Unlock()
 	x.hWndPeer = 0
-	log.Info(x.peerWindowClassName + ": peer closed")
+	log.Debug(x.peerWindowClassName + ": peer closed")
 }
 
 func (x *NotifyWindow) InitPeer() {
@@ -50,7 +50,7 @@ func (x *NotifyWindow) initPeer() {
 		log.PrintErr(x.peerWindowClassName + ": init peer: window class not found")
 		return
 	}
-	log.Info(x.peerWindowClassName + ": init peer")
+	log.Debug(x.peerWindowClassName + ": init peer")
 }
 
 func (x *NotifyWindow) sendMsg(msg uintptr, b []byte) {
