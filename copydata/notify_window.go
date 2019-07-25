@@ -46,11 +46,6 @@ func (x *NotifyWindow) InitPeer() {
 
 func (x *NotifyWindow) initPeer() {
 	x.hWndPeer = winapp.FindWindow(x.peerWindowClassName)
-	if !winapp.IsWindow(x.hWndPeer) {
-		log.PrintErr(x.peerWindowClassName + ": init peer: window class not found")
-		return
-	}
-	log.Debug(x.peerWindowClassName + ": init peer")
 }
 
 func (x *NotifyWindow) sendMsg(msg uintptr, b []byte) {
@@ -59,8 +54,8 @@ func (x *NotifyWindow) sendMsg(msg uintptr, b []byte) {
 	if x.hWndPeer == 0 {
 		x.initPeer()
 	}
-	if x.hWndPeer != 0 && SendMessage(x.hWnd, x.hWndPeer, msg, b) == 0 {
-		log.PrintErr(fmt.Sprintf("SendMessage failed: %s: %d, %+v, %+v", x.peerWindowClassName, msg, x.hWnd, x.hWndPeer))
+	if SendMessage(x.hWnd, x.hWndPeer, msg, b) == 0 {
+		x.hWndPeer = 0
 	}
 }
 
