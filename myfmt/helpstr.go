@@ -1,4 +1,4 @@
-package helpstr
+package myfmt
 
 import (
 	"bytes"
