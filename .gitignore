@@ -11,3 +11,5 @@ bin
 *.stat
 *.vlb
 *.rsm
+*.qtpl.go
+internal/api/notify/api_generated.go
