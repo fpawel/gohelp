@@ -6,8 +6,15 @@ import (
 	"github.com/ansel1/merry"
 	"path/filepath"
 	"runtime"
+	"strconv"
+	"strings"
 	"time"
 )
+
+func FormatFloat(v float64, prec int) string {
+	s := strconv.FormatFloat(v, 'f', prec, 64)
+	return strings.TrimRight(strings.TrimRight(s, "0"), ".")
+}
 
 func FormatDuration(d time.Duration) string {
 
