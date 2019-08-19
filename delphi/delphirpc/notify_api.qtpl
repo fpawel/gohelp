@@ -16,13 +16,19 @@ const (
     {% for _,m := range x.services[1:] %}msg{%s m.serviceName %}
     {% endfor %}
 )
-
-{% for _,m := range x.services %}func {%s m.serviceName %}(log *structlog.Logger, arg {%s m.goType %}) {
+{% for _,m := range x.services %}{% if m.handlerType == "TProcedure" %}
+func {%s m.serviceName %}(log *structlog.Logger) {
+    if log != nil {
+        msg{%s m.serviceName %}.Log(log)(peer.WindowClassName + ": {%s m.serviceName %}" , "MSG", msg{%s m.serviceName %}, )
+    }
+    go peer.NotifyStr( uintptr(msg{%s m.serviceName %}), "" )
+}{% else %}
+func {%s m.serviceName %}(log *structlog.Logger, arg {%s m.goType %}) {
     if log != nil {
         msg{%s m.serviceName %}.Log(log)(peer.WindowClassName + ": {%s m.serviceName %}: "+ fmt.Sprintf("%+v",arg), "MSG", msg{%s m.serviceName %}, )
     }
     {% if m.serviceName != "Warning" %}go {% endif %}peer.{%s m.notifyFunc %}( uintptr(msg{%s m.serviceName %}), {%s= m.instructionArg %} )
-}
+}{% endif %}
 {% if m.notifyFunc == "NotifyStr" %}
 func {%s m.serviceName %}f(log *structlog.Logger, format string, a ...interface{}) {
     if log != nil {
@@ -31,7 +37,5 @@ func {%s m.serviceName %}f(log *structlog.Logger, format string, a ...interface{
     {% if m.serviceName != "Warning" %}go {% endif %}peer.Notifyf( uintptr(msg{%s m.serviceName %}), format, a... )
 }{% endif %}
 {% endfor %}
-
-
 
 {% endfunc %}

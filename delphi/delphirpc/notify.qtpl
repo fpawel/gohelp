@@ -8,7 +8,7 @@ interface
 uses superobject, Winapi.Windows, Winapi.Messages, server_data_types;
 
 type
-    {% for t,ht := range x.types %}{%s ht %} = reference to procedure (x:{%s t %});
+    {% for handlerType,typeDecl := range x.delphiHandlersTypes %}{%s handlerType %} = {%s typeDecl %};
     {% endfor %}
 
 procedure HandleCopydata(var Message: TMessage);
@@ -30,7 +30,7 @@ type
     end;
 
 var
-    {% for _,m := range x.services %}_On{%s m.serviceName %} : {%s m.typeName %}Handler;
+    {% for _,m := range x.services %}_On{%s m.serviceName %} : {%s m.handlerType %};
     {% endfor %}_enabled:boolean;
 
 class function _deserializer.deserialize<T>(str:string):T;

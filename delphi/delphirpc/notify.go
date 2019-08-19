@@ -5,13 +5,14 @@ import (
 	"log"
 	"path"
 	r "reflect"
+	"strings"
 )
 
 type NotifyServicesSrc struct {
-	types     map[string]string
-	goImports map[string]struct{}
-	services  []notifyService
-	DataTypes *TypesUnit
+	delphiHandlersTypes map[string]string
+	goImports           map[string]struct{}
+	services            []notifyService
+	DataTypes           *TypesUnit
 }
 
 type NotifyServiceType struct {
@@ -31,8 +32,8 @@ type notifyService struct {
 
 func NewNotifyServicesSrc(d *TypesUnit, peerPackage string, services []NotifyServiceType) *NotifyServicesSrc {
 	x := &NotifyServicesSrc{
-		DataTypes: d,
-		types:     make(map[string]string),
+		DataTypes:           d,
+		delphiHandlersTypes: make(map[string]string),
 		goImports: map[string]struct{}{
 			"fmt":                           {},
 			peerPackage:                     {},
@@ -42,19 +43,32 @@ func NewNotifyServicesSrc(d *TypesUnit, peerPackage string, services []NotifySer
 
 	for _, s := range services {
 
+		if s.ParamType.Kind() == r.Struct && s.ParamType.NumField() == 0 {
+			x.services = append(x.services, notifyService{
+				serviceName: s.ServiceName,
+				handlerType: "TProcedure",
+			})
+			x.delphiHandlersTypes["TProcedure"] = "reference to procedure"
+			continue
+		}
+
 		t, err := x.DataTypes.add(s.ParamType)
 
 		if err != nil {
 			log.Fatalln("notify_service:", s.ServiceName, "error:", err)
 		}
 
+		handlerTypeName := strings.Title(t.TypeName() + "Handler")
+		if handlerTypeName[0] != 'T' {
+			handlerTypeName = "T" + handlerTypeName
+		}
+
 		y := notifyService{
 			serviceName: s.ServiceName,
 			typeName:    t.TypeName(),
-			handlerType: t.TypeName() + "Handler",
+			handlerType: handlerTypeName,
 			goType:      s.ParamType.Name(),
 		}
-		x.types[y.typeName] = y.handlerType
 
 		if len(s.ParamType.PkgPath()) > 0 {
 			x.goImports[s.ParamType.PkgPath()] = struct{}{}
@@ -90,11 +104,11 @@ func NewNotifyServicesSrc(d *TypesUnit, peerPackage string, services []NotifySer
 			y.instructionGetFromStr = fmt.Sprintf("_deserializer.deserialize<%s>(str)", t.TypeName())
 			y.notifyFunc = "NotifyJson"
 			y.instructionArg = "arg"
-
 		default:
 			panic(fmt.Sprintf("wrong type %q: %v", s.ServiceName, s.ParamType))
 		}
 
+		x.delphiHandlersTypes[y.handlerType] = fmt.Sprintf("reference to procedure (x:%s)", y.typeName)
 		x.services = append(x.services, y)
 	}
 	return x
