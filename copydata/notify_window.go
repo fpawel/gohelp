@@ -54,8 +54,13 @@ func (x *NotifyWindow) sendMsg(msg uintptr, b []byte) {
 	if x.hWndPeer == 0 {
 		x.initPeer()
 	}
+	if x.hWndPeer == 0 {
+		log.PrintErr("notify: window not found: "+x.peerWindowClassName, "msg_code", msg)
+		return
+	}
 	if SendMessage(x.hWnd, x.hWndPeer, msg, b) == 0 {
 		x.hWndPeer = 0
+		log.PrintErr("notify: SendMessage failed: "+x.peerWindowClassName, "msg_code", msg)
 	}
 }
 
