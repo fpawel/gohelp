@@ -5,11 +5,21 @@
 package notify
 
 import (
-	{% for imp := range x.goImports %}"{%s imp %}"
+    "fmt"
+    "github.com/fpawel/gohelp/copydata"
+    "github.com/fpawel/gohelp/winapp"
+    {% for imp := range x.goImports %}"{%s imp %}"
     {% endfor %}
 )
 
 type msg int
+
+type logFunc = func (interface{}, ...interface{})
+
+const  (
+    PeerWindowClassName = "{%s x.PeerWindowClassName %}"
+    ServerWindowClassName = "{%s x.ServerWindowClassName %}"
+)
 
 const (
     msg{%s x.services[0].serviceName %} msg = iota
@@ -17,25 +27,31 @@ const (
     {% endfor %}
 )
 {% for _,m := range x.services %}{% if m.handlerType == "TProcedure" %}
-func {%s m.serviceName %}(log *structlog.Logger) {
-    if log != nil {
-        msg{%s m.serviceName %}.Log(log)(peer.WindowClassName + ": {%s m.serviceName %}" , "MSG", msg{%s m.serviceName %}, )
+func {%s m.serviceName %}(logFunc logFunc) bool {
+    if logFunc != nil {
+        logFunc(PeerWindowClassName + ": {%s m.serviceName %}" , "MSG", msg{%s m.serviceName %}, )
     }
-    go peer.NotifyStr( uintptr(msg{%s m.serviceName %}), "" )
+    return Window.NotifyStr( uintptr(msg{%s m.serviceName %}), "" )
 }{% else %}
-func {%s m.serviceName %}(log *structlog.Logger, arg {%s m.goType %}) {
-    if log != nil {
-        msg{%s m.serviceName %}.Log(log)(peer.WindowClassName + ": {%s m.serviceName %}: "+ fmt.Sprintf("%+v",arg), "MSG", msg{%s m.serviceName %}, )
+func {%s m.serviceName %}(logFunc logFunc, arg {%s m.goType %}) bool{
+    if logFunc != nil {
+        logFunc(PeerWindowClassName + ": {%s m.serviceName %}: "+ fmt.Sprintf("%+v",arg), "MSG", msg{%s m.serviceName %}, )
     }
-    {% if m.serviceName != "Warning" %}go {% endif %}peer.{%s m.notifyFunc %}( uintptr(msg{%s m.serviceName %}), {%s= m.instructionArg %} )
+    return Window.{%s m.notifyFunc %}( uintptr(msg{%s m.serviceName %}), {%s= m.instructionArg %} )
 }{% endif %}
 {% if m.notifyFunc == "NotifyStr" %}
-func {%s m.serviceName %}f(log *structlog.Logger, format string, a ...interface{}) {
-    if log != nil {
-        msg{%s m.serviceName %}.Log(log)(peer.WindowClassName + ": {%s m.serviceName %}: " + fmt.Sprintf(format,a...), "MSG", msg{%s m.serviceName %}, )
+func {%s m.serviceName %}f(logFunc logFunc, format string, a ...interface{}) bool {
+    if logFunc != nil {
+        logFunc(PeerWindowClassName + ": {%s m.serviceName %}: " + fmt.Sprintf(format,a...), "MSG", msg{%s m.serviceName %}, )
     }
-    {% if m.serviceName != "Warning" %}go {% endif %}peer.Notifyf( uintptr(msg{%s m.serviceName %}), format, a... )
+    return Window.Notifyf( uintptr(msg{%s m.serviceName %}), format, a... )
 }{% endif %}
 {% endfor %}
 
+var (
+    ServerWindowAlreadyExists = winapp.IsWindow(winapp.FindWindow(ServerWindowClassName))
+    PeerWindowAlreadyExists = winapp.IsWindow(winapp.FindWindow(PeerWindowClassName))
+	// окно для отправки сообщений WM_COPYDATA дельфи-приложению
+	Window = copydata.NewNotifyWindow(ServerWindowClassName, PeerWindowClassName)
+)
 {% endfunc %}

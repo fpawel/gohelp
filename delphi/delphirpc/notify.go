@@ -9,10 +9,12 @@ import (
 )
 
 type NotifyServicesSrc struct {
-	delphiHandlersTypes map[string]string
-	goImports           map[string]struct{}
-	services            []notifyService
-	DataTypes           *TypesUnit
+	delphiHandlersTypes   map[string]string
+	goImports             map[string]struct{}
+	services              []notifyService
+	DataTypes             *TypesUnit
+	PeerWindowClassName   string
+	ServerWindowClassName string
 }
 
 type NotifyServiceType struct {
@@ -30,15 +32,13 @@ type notifyService struct {
 	instructionArg string
 }
 
-func NewNotifyServicesSrc(d *TypesUnit, peerPackage string, services []NotifyServiceType) *NotifyServicesSrc {
+func NewNotifyServicesSrc(serverWindowClassName, peerWindowClassName string, d *TypesUnit, services []NotifyServiceType) *NotifyServicesSrc {
 	x := &NotifyServicesSrc{
-		DataTypes:           d,
-		delphiHandlersTypes: make(map[string]string),
-		goImports: map[string]struct{}{
-			"fmt":                           {},
-			peerPackage:                     {},
-			"github.com/powerman/structlog": {},
-		},
+		DataTypes:             d,
+		PeerWindowClassName:   peerWindowClassName,
+		ServerWindowClassName: serverWindowClassName,
+		delphiHandlersTypes:   make(map[string]string),
+		goImports:             make(map[string]struct{}),
 	}
 
 	for _, s := range services {

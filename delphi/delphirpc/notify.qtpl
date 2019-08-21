@@ -12,6 +12,7 @@ type
     {% endfor %}
 
 procedure HandleCopydata(var Message: TMessage);
+procedure CloseServerWindow;
 
 {% for _,m := range x.services %}procedure SetOn{%s m.serviceName %}( AHandler : {%s m.handlerType %});
 {% endfor %}
@@ -32,6 +33,11 @@ type
 var
     {% for _,m := range x.services %}_On{%s m.serviceName %} : {%s m.handlerType %};
     {% endfor %}_enabled:boolean;
+
+procedure CloseServerWindow;
+begin
+    SendMessage(FindWindow('{%s x.ServerWindowClassName %}', nil), WM_CLOSE, 0, 0)
+end;
 
 class function _deserializer.deserialize<T>(str:string):T;
 begin

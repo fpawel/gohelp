@@ -14,9 +14,10 @@ type SrcServices struct {
 	Types []reflect.Type
 }
 type SrcNotify struct {
-	Dir         string
-	Types       []NotifyServiceType
-	PeerPackage string
+	Dir                   string
+	Types                 []NotifyServiceType
+	PeerWindowClassName   string
+	ServerWindowClassName string
 }
 
 func WriteSources(srv SrcServices, ntf SrcNotify) {
@@ -25,7 +26,10 @@ func WriteSources(srv SrcServices, ntf SrcNotify) {
 	}
 
 	servicesSrc := NewServicesUnit(srv.Types)
-	notifySvcSrc := NewNotifyServicesSrc(servicesSrc.TypesUnit, ntf.PeerPackage, ntf.Types)
+	notifySvcSrc := NewNotifyServicesSrc(
+		ntf.ServerWindowClassName,
+		ntf.PeerWindowClassName,
+		servicesSrc.TypesUnit, ntf.Types)
 
 	createFile := func(fileName string) *os.File {
 		return must.Create(filepath.Join(srv.Dir, fileName))
