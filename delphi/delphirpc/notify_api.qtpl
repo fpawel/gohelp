@@ -27,24 +27,17 @@ const (
     {% endfor %}
 )
 {% for _,m := range x.services %}{% if m.handlerType == "TProcedure" %}
-func {%s m.serviceName %}(logFunc logFunc) bool {
+func {%s m.serviceName %}(logFunc logFunc, a ...interface{}) bool {
     if logFunc != nil {
-        logFunc(PeerWindowClassName + ": {%s m.serviceName %}" , "MSG", msg{%s m.serviceName %}, )
+        logFunc("{%s m.serviceName %}", append(a, "MSG", uintptr(msg{%s m.serviceName %}))... )
     }
     return Window.NotifyStr( uintptr(msg{%s m.serviceName %}), "" )
 }{% else %}
-func {%s m.serviceName %}(logFunc logFunc, arg {%s m.goType %}) bool{
+func {%s m.serviceName %}(logFunc logFunc, arg {%s m.goType %}, a ...interface{}) bool{
     if logFunc != nil {
-        logFunc(PeerWindowClassName + ": {%s m.serviceName %}: "+ fmt.Sprintf("%+v",arg), "MSG", msg{%s m.serviceName %}, )
+        logFunc("{%s m.serviceName %}", append(a, "arg", arg, "MSG", uintptr(msg{%s m.serviceName %}))... )
     }
     return Window.{%s m.notifyFunc %}( uintptr(msg{%s m.serviceName %}), {%s= m.instructionArg %} )
-}{% endif %}
-{% if m.notifyFunc == "NotifyStr" %}
-func {%s m.serviceName %}f(logFunc logFunc, format string, a ...interface{}) bool {
-    if logFunc != nil {
-        logFunc(PeerWindowClassName + ": {%s m.serviceName %}: " + fmt.Sprintf(format,a...), "MSG", msg{%s m.serviceName %}, )
-    }
-    return Window.Notifyf( uintptr(msg{%s m.serviceName %}), format, a... )
 }{% endif %}
 {% endfor %}
 
