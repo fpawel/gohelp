@@ -16,7 +16,7 @@ func main() {
 		panic(err)
 	}
 
-	pathS = filepath.Join(pathS, "..", "..")
+	fmt.Println("sqlstr:", pathS)
 
 	r := regexp.MustCompile(`db_([A-Za-z]+)\.sql`)
 
