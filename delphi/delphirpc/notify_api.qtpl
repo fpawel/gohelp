@@ -41,10 +41,18 @@ func {%s m.serviceName %}(logFunc logFunc, arg {%s m.goType %}, a ...interface{}
 }{% endif %}
 {% endfor %}
 
+func InitServerWindow(classNamePrefix string){
+    if Window != nil {
+        Window.Close()
+    }
+    serverWindowClassName := ServerWindowClassName + classNamePrefix
+    ServerWindowAlreadyExists = winapp.IsWindow(winapp.FindWindow(serverWindowClassName))
+	Window = copydata.NewNotifyWindow(serverWindowClassName, PeerWindowClassName)
+}
+
 var (
     ServerWindowAlreadyExists = winapp.IsWindow(winapp.FindWindow(ServerWindowClassName))
-    PeerWindowAlreadyExists = winapp.IsWindow(winapp.FindWindow(PeerWindowClassName))
-	// окно для отправки сообщений WM_COPYDATA дельфи-приложению
+    // окно для отправки сообщений WM_COPYDATA дельфи-приложению
 	Window = copydata.NewNotifyWindow(ServerWindowClassName, PeerWindowClassName)
 )
 {% endfunc %}
