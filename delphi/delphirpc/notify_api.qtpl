@@ -5,7 +5,6 @@
 package notify
 
 import (
-    "fmt"
     "github.com/fpawel/gohelp/copydata"
     "github.com/fpawel/gohelp/winapp"
     {% for imp := range x.goImports %}"{%s imp %}"
