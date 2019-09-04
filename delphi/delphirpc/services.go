@@ -8,6 +8,7 @@ import (
 
 type ServicesUnit struct {
 	TypesUnit *TypesUnit
+	Name      string
 	services  []service
 }
 
@@ -16,8 +17,9 @@ type service struct {
 	methods     []delphiServiceMethod
 }
 
-func NewServicesUnit(types []r.Type) *ServicesUnit {
+func NewServicesUnit(name string, types []r.Type) *ServicesUnit {
 	src := &ServicesUnit{
+		Name:      name,
 		TypesUnit: new(TypesUnit),
 	}
 	for _, t := range types {

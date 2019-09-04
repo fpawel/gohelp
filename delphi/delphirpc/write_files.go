@@ -10,6 +10,7 @@ import (
 )
 
 type SrcServices struct {
+	Name  string
 	Dir   string
 	Types []reflect.Type
 }
@@ -25,7 +26,7 @@ func WriteSources(srv SrcServices, ntf SrcNotify) {
 		log.Fatal(err)
 	}
 
-	servicesSrc := NewServicesUnit(srv.Types)
+	servicesSrc := NewServicesUnit(srv.Name, srv.Types)
 	notifySvcSrc := NewNotifyServicesSrc(
 		ntf.ServerWindowClassName,
 		ntf.PeerWindowClassName,

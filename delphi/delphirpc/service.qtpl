@@ -18,7 +18,22 @@ type
 
 implementation 
 
-uses HttpRpcClient, SuperObjectHelp, Grijjy.Bson.Serialization;
+uses System.SysUtils, registry, winapi.windows, HttpRpcClient, SuperObjectHelp, Grijjy.Bson.Serialization;
+
+function GetHttpServerAddr: string;
+var
+    key: TRegistry;
+begin
+    key := TRegistry.Create(KEY_READ);
+    try
+        if not key.OpenKey( '{%s x.Name %}\http', False) then
+            raise Exception.Create('cant open {%s x.Name %}\http');
+        result := key.ReadString('addr');
+    finally
+        key.CloseKey;
+        key.Free;
+    end;
+end;
 
 {% for _, srv := range x.services %} {% for _,m := range srv.methods %}{%s= m.implementation(srv.serviceName) %}
 {% endfor %}{% endfor %} 
@@ -30,23 +45,20 @@ var
     req : ISuperobject;{%if x.namedParams %}s:string;{% endif %}
 begin
     req := {%if x.namedParams || len(x.params)==0 %}SO{% else %}SA([]){% endif %};
-
     {% for _, p := range x.params %}{% collapsespace %}
         {%if x.namedParams %}
             {%s= setParamFieldInstruction(p.delphiType.kind, p.name) %};
         {% else %}
             req.AsArray.Add({%s p.name %});
-        {% endif %}{% endcollapsespace %}
-    {% endfor %}
-
+        {% endif %}{% endcollapsespace %}{% endfor %}
     {% collapsespace %}
     {%if x.ret == nil %}
-        ThttpRpcClient.GetResponse('{%s= serviceName %}.{%s= x.methodName %}', req);
+        ThttpRpcClient.GetResponse(GetHttpServerAddr + '/rpc', '{%s= serviceName %}.{%s= x.methodName %}', req);
     {% else %}
         {%if x.ret.kind == delphiPOD %}
-            SuperObject_Get(ThttpRpcClient.GetResponse('{%s= serviceName %}.{%s= x.methodName %}', req), Result);
+            SuperObject_Get(ThttpRpcClient.GetResponse(GetHttpServerAddr + '/rpc', '{%s= serviceName %}.{%s= x.methodName %}', req), Result);
         {% else %}
-            ThttpRpcClient.Call('{%s= serviceName %}.{%s= x.methodName %}', req, Result);
+            ThttpRpcClient.Call(GetHttpServerAddr + '/rpc', '{%s= serviceName %}.{%s= x.methodName %}', req, Result);
         {% endif %}
     {% endif %}
     {% endcollapsespace %}
