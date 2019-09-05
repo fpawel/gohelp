@@ -10,7 +10,6 @@ import (
 )
 
 type SrcServices struct {
-	Name  string
 	Dir   string
 	Types []reflect.Type
 }
@@ -21,12 +20,12 @@ type SrcNotify struct {
 	ServerWindowClassName string
 }
 
-func WriteSources(srv SrcServices, ntf SrcNotify) {
+func WriteSources(name string, srv SrcServices, ntf SrcNotify) {
 	if err := winapp.EnsuredDirectory(srv.Dir); err != nil {
 		log.Fatal(err)
 	}
 
-	servicesSrc := NewServicesUnit(srv.Name, srv.Types)
+	servicesSrc := NewServicesUnit(name, srv.Types)
 	notifySvcSrc := NewNotifyServicesSrc(
 		ntf.ServerWindowClassName,
 		ntf.PeerWindowClassName,

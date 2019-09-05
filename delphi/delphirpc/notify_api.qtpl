@@ -5,6 +5,7 @@
 package notify
 
 import (
+    "fmt"
     "github.com/fpawel/gohelp/copydata"
     "github.com/fpawel/gohelp/winapp"
     {% for imp := range x.goImports %}"{%s imp %}"
@@ -34,7 +35,8 @@ func {%s m.serviceName %}(logFunc logFunc, a ...interface{}) bool {
 }{% else %}
 func {%s m.serviceName %}(logFunc logFunc, arg {%s m.goType %}, a ...interface{}) bool{
     if logFunc != nil {
-        logFunc("{%s m.serviceName %}", append(a, "arg", arg, "MSG", uintptr(msg{%s m.serviceName %}))... )
+        logFunc(fmt.Sprintf("%+v", arg) ,
+            append(a, "notify_message", "{%s m.serviceName %}", "notify_message_code", msg{%s m.serviceName %})... )
     }
     return Window.{%s m.notifyFunc %}( uintptr(msg{%s m.serviceName %}), {%s= m.instructionArg %} )
 }{% endif %}

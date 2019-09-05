@@ -16,6 +16,8 @@ type
 
     {% endfor %}
 
+function GetHttpServerAddr: string;
+
 implementation 
 
 uses System.SysUtils, registry, winapi.windows, HttpRpcClient, SuperObjectHelp, Grijjy.Bson.Serialization;
