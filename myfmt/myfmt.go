@@ -12,6 +12,9 @@ import (
 )
 
 func FormatFloat(v float64, prec int) string {
+	if v == 0 {
+		return "0"
+	}
 	s := strconv.FormatFloat(v, 'f', prec, 64)
 	return strings.TrimRight(strings.TrimRight(s, "0"), ".")
 }
