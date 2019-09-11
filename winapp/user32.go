@@ -1,7 +1,7 @@
 package winapp
 
 import (
-	"github.com/fpawel/goutils"
+	"github.com/fpawel/gohelp/must"
 	"github.com/lxn/win"
 	"syscall"
 	"unsafe"
@@ -43,7 +43,7 @@ func IsWindow(hWnd win.HWND) bool {
 }
 
 func FindWindow(className string) win.HWND {
-	ptrClassName := goutils.MustUTF16PtrFromString(className)
+	ptrClassName := must.UTF16PtrFromString(className)
 	return win.FindWindow(ptrClassName, nil)
 }
 

@@ -1,7 +1,7 @@
 package winapp
 
 import (
-	"github.com/fpawel/goutils"
+	"github.com/fpawel/gohelp/must"
 	"github.com/lxn/walk"
 	"github.com/lxn/win"
 	"syscall"
@@ -26,7 +26,7 @@ func NewWindowWithClassName(windowClassName string, windowProcedure WindowProced
 
 	return win.CreateWindowEx(
 		0,
-		goutils.MustUTF16PtrFromString(windowClassName),
+		must.UTF16PtrFromString(windowClassName),
 		nil,
 		0,
 		0,
