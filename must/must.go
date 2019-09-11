@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"syscall"
 )
 
 // AbortIf should point to FatalIf or PanicIf or similar user-provided
@@ -238,4 +239,12 @@ func WriteAt(f io.WriterAt, b []byte, off int64) int {
 func WriteFile(name string, buf []byte, perm os.FileMode) {
 	err := ioutil.WriteFile(name, buf, perm)
 	AbortIf(err)
+}
+
+func UTF16PtrFromString(s string) *uint16 {
+	p, err := syscall.UTF16PtrFromString(s)
+	if err != nil {
+		panic(err)
+	}
+	return p
 }
