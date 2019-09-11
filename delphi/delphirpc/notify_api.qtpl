@@ -12,8 +12,6 @@ import (
     {% endfor %}
 )
 
-type msg int
-
 type logFunc = func (interface{}, ...interface{})
 
 const  (
@@ -22,23 +20,23 @@ const  (
 )
 
 const (
-    msg{%s x.services[0].serviceName %} msg = iota
-    {% for _,m := range x.services[1:] %}msg{%s m.serviceName %}
+    Msg{%s x.services[0].serviceName %} uintptr = iota
+    {% for _,m := range x.services[1:] %}Msg{%s m.serviceName %}
     {% endfor %}
 )
 {% for _,m := range x.services %}{% if m.handlerType == "TProcedure" %}
 func {%s m.serviceName %}(logFunc logFunc, a ...interface{}) bool {
     if logFunc != nil {
-        logFunc("{%s m.serviceName %}", append(a, "MSG", uintptr(msg{%s m.serviceName %}))... )
+        logFunc("{%s m.serviceName %}", append(a, "MSG", Msg{%s m.serviceName %})... )
     }
-    return Window.NotifyStr( uintptr(msg{%s m.serviceName %}), "" )
+    return Window.NotifyStr( Msg{%s m.serviceName %}, "" )
 }{% else %}
 func {%s m.serviceName %}(logFunc logFunc, arg {%s m.goType %}, a ...interface{}) bool{
     if logFunc != nil {
         logFunc(fmt.Sprintf("%+v", arg) ,
-            append(a, "notify_message", "{%s m.serviceName %}", "notify_message_code", msg{%s m.serviceName %})... )
+            append(a, "notify_message", "{%s m.serviceName %}", "notify_message_code", Msg{%s m.serviceName %})... )
     }
-    return Window.{%s m.notifyFunc %}( uintptr(msg{%s m.serviceName %}), {%s= m.instructionArg %} )
+    return Window.{%s m.notifyFunc %}( Msg{%s m.serviceName %}, {%s= m.instructionArg %} )
 }{% endif %}
 {% endfor %}
 
