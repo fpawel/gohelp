@@ -3,8 +3,8 @@ package copydata
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/fpawel/gohelp"
 	"github.com/fpawel/gohelp/winapp"
-	"github.com/fpawel/goutils"
 	"github.com/lxn/win"
 )
 
@@ -58,7 +58,7 @@ func (x *NotifyWindow) Notify(msg uintptr, a ...interface{}) bool {
 }
 
 func (x *NotifyWindow) NotifyStr(msg uintptr, s string) bool {
-	return x.sendMsg(msg, goutils.UTF16FromString(s))
+	return x.sendMsg(msg, gohelp.UTF16FromString(s))
 }
 
 func (x *NotifyWindow) NotifyJson(msg uintptr, param interface{}) bool {

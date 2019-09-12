@@ -7,17 +7,19 @@ package notify
 import (
     "fmt"
     "github.com/fpawel/gohelp/copydata"
-    "github.com/fpawel/gohelp/winapp"
     {% for imp := range x.goImports %}"{%s imp %}"
     {% endfor %}
 )
 
-type logFunc = func (interface{}, ...interface{})
+type Window struct{
+    W *copydata.NotifyWindow
+}
 
-const  (
-    PeerWindowClassName = "{%s x.PeerWindowClassName %}"
-    ServerWindowClassName = "{%s x.ServerWindowClassName %}"
-)
+func NewWindow(serverClassName, peerClassName string) Window {
+    return Window{W:copydata.NewNotifyWindow(serverClassName, peerClassName)}
+}
+
+type logFunc = func (interface{}, ...interface{})
 
 const (
     Msg{%s x.services[0].serviceName %} uintptr = iota
@@ -25,33 +27,19 @@ const (
     {% endfor %}
 )
 {% for _,m := range x.services %}{% if m.handlerType == "TProcedure" %}
-func {%s m.serviceName %}(logFunc logFunc, a ...interface{}) bool {
+func (x Window) {%s m.serviceName %}(logFunc logFunc, a ...interface{}) bool {
     if logFunc != nil {
         logFunc("{%s m.serviceName %}", append(a, "MSG", Msg{%s m.serviceName %})... )
     }
-    return Window.NotifyStr( Msg{%s m.serviceName %}, "" )
+    return x.W.NotifyStr( Msg{%s m.serviceName %}, "" )
 }{% else %}
-func {%s m.serviceName %}(logFunc logFunc, arg {%s m.goType %}, a ...interface{}) bool{
+func (x Window) {%s m.serviceName %}(logFunc logFunc, arg {%s m.goType %}, a ...interface{}) bool{
     if logFunc != nil {
         logFunc(fmt.Sprintf("%+v", arg) ,
             append(a, "notify_message", "{%s m.serviceName %}", "notify_message_code", Msg{%s m.serviceName %})... )
     }
-    return Window.{%s m.notifyFunc %}( Msg{%s m.serviceName %}, {%s= m.instructionArg %} )
+    return x.W.{%s m.notifyFunc %}( Msg{%s m.serviceName %}, {%s= m.instructionArg %} )
 }{% endif %}
 {% endfor %}
 
-func InitServerWindow(classNamePrefix string){
-    if Window != nil {
-        Window.Close()
-    }
-    serverWindowClassName := ServerWindowClassName + classNamePrefix
-    ServerWindowAlreadyExists = winapp.IsWindow(winapp.FindWindow(serverWindowClassName))
-	Window = copydata.NewNotifyWindow(serverWindowClassName, PeerWindowClassName)
-}
-
-var (
-    ServerWindowAlreadyExists = winapp.IsWindow(winapp.FindWindow(ServerWindowClassName))
-    // окно для отправки сообщений WM_COPYDATA дельфи-приложению
-	Window = copydata.NewNotifyWindow(ServerWindowClassName, PeerWindowClassName)
-)
 {% endfunc %}

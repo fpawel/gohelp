@@ -13,7 +13,6 @@ type NotifyServicesSrc struct {
 	goImports             map[string]struct{}
 	services              []notifyService
 	DataTypes             *TypesUnit
-	PeerWindowClassName   string
 	ServerWindowClassName string
 }
 
@@ -32,10 +31,9 @@ type notifyService struct {
 	instructionArg string
 }
 
-func NewNotifyServicesSrc(serverWindowClassName, peerWindowClassName string, d *TypesUnit, services []NotifyServiceType) *NotifyServicesSrc {
+func NewNotifyServicesSrc(serverWindowClassName string, d *TypesUnit, services []NotifyServiceType) *NotifyServicesSrc {
 	x := &NotifyServicesSrc{
 		DataTypes:             d,
-		PeerWindowClassName:   peerWindowClassName,
 		ServerWindowClassName: serverWindowClassName,
 		delphiHandlersTypes:   make(map[string]string),
 		goImports:             make(map[string]struct{}),
