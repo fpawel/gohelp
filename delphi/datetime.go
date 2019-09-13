@@ -1,8 +1,7 @@
 package delphi
 
 import (
-	"errors"
-	"fmt"
+	"github.com/ansel1/merry"
 	"time"
 )
 
@@ -29,8 +28,8 @@ func NewDateTime(t time.Time) GoDateTime {
 }
 
 var (
-	ErrWrongTime = errors.New("wrong time")
-	ErrWrongDate = errors.New("wrong date")
+	ErrWrongTime = merry.New("wrong time")
+	ErrWrongDate = merry.New("wrong date")
 )
 
 func EncodeDateTime(t time.Time) float64 {
@@ -63,7 +62,7 @@ func encodeTime(h, m, s, ms int) (float64, error) {
 		(m * SecsPerMin * MSecsPerSec) +
 		(s * MSecsPerSec) + ms
 	if t < 0 || t >= MSecsPerDay {
-		return 0, ErrWrongTime
+		return 0, ErrWrongTime.Here().Appendf("%d:%d:%d.%d")
 	}
 	return float64(t) / float64(MSecsPerDay), nil
 
@@ -81,7 +80,7 @@ func encodeDate(y, m, d int) (int, error) {
 		i := y - 1
 		return i*365 + i/4 - i/100 + i/400 + d - dateDelta, nil
 	}
-	return 0, fmt.Errorf("wrong date %d/%d/%d", y, m, d)
+	return 0, ErrWrongDate.Here().Appendf("%d/%d/%d", y, m, d)
 }
 
 var (
