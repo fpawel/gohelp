@@ -2,6 +2,7 @@ package winapp
 
 import (
 	"github.com/ansel1/merry"
+	"github.com/fpawel/gohelp"
 	"github.com/lxn/win"
 	"os"
 	"os/exec"
@@ -9,14 +10,6 @@ import (
 	"path/filepath"
 	"syscall"
 )
-
-func EnsuredDirectory(dir string) error {
-	_, err := os.Stat(dir)
-	if os.IsNotExist(err) { // создать каталог если его нет
-		err = os.MkdirAll(dir, os.ModePerm)
-	}
-	return err
-}
 
 func AppDataFolderPath() (string, error) {
 	var dir string
@@ -45,7 +38,7 @@ func ProfileFolderPath(elements ...string) (string, error) {
 	}
 	elements = append([]string{usr.HomeDir}, elements...)
 	folderPath := filepath.Join(elements...)
-	if err = EnsuredDirectory(folderPath); err != nil {
+	if err = gohelp.EnsuredDir(folderPath); err != nil {
 		return "", merry.Wrap(err)
 	}
 	return folderPath, nil

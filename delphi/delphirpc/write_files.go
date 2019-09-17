@@ -1,8 +1,8 @@
 package delphirpc
 
 import (
+	"github.com/fpawel/gohelp"
 	"github.com/fpawel/gohelp/must"
-	"github.com/fpawel/gohelp/winapp"
 	"log"
 	"os"
 	"path/filepath"
@@ -20,7 +20,7 @@ type SrcNotify struct {
 }
 
 func WriteSources(name string, srv SrcServices, ntf SrcNotify) {
-	if err := winapp.EnsuredDirectory(srv.Dir); err != nil {
+	if err := gohelp.EnsuredDir(srv.Dir); err != nil {
 		log.Fatal(err)
 	}
 

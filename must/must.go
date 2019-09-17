@@ -2,6 +2,8 @@ package must
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/fpawel/gohelp"
 	"io"
 	"io/ioutil"
 	"log"
@@ -247,4 +249,10 @@ func UTF16PtrFromString(s string) *uint16 {
 		panic(err)
 	}
 	return p
+}
+
+func EnsureDir(dir string) {
+	if err := gohelp.EnsuredDir(dir); err != nil {
+		panic(fmt.Sprintf("%s: %v", dir, err))
+	}
 }
