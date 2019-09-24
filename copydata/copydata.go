@@ -19,7 +19,7 @@ func GetData(ptr unsafe.Pointer) (uintptr, []byte) {
 }
 
 func PtrSliceFrom(p unsafe.Pointer, s int) unsafe.Pointer {
-	return unsafe.Pointer(&reflect.SliceHeader{Data: uintptr(p), Len: s, Cap: s})
+	return &reflect.SliceHeader{Data: uintptr(p), Len: s, Cap: s}
 }
 
 func SendMessage(hWndSource, hWndTarget win.HWND, wParam uintptr, b []byte) uintptr {
